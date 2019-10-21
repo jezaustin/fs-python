@@ -1,0 +1,7 @@
+{"namespace": "readings.avro",
+ "type": "record",
+ "name": "Readings",
+ "fields": [
+     {"name": "readings", "type": { "type": "array", "items": "int" } }
+ ]
+}

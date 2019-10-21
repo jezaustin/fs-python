@@ -1,0 +1,2 @@
+avro-python3==1.9.1
+confluent-kafka==1.2.0
