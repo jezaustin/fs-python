@@ -12,7 +12,7 @@ from confluent_kafka import Consumer
 ###
 
 # Address of the kafka servers and topic name
-kafka_servers = 'localhost:9092'
+kafka_servers = '192.168.56.101:9092'
 topic_name = 'test'
 
 # Whether to only listen for messages that occurred since the consumer started ('latest'),
