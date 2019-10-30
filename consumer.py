@@ -29,6 +29,7 @@ throughput_debug_interval_in_sec = 1
 
 kbs_in_mb = 1000
 
+print('Connecting to Kafka @ {}'.format(kafka_servers))
 c = Consumer({
     'bootstrap.servers': kafka_servers,
     'group.id': 'mygroup',

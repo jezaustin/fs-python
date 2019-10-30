@@ -58,6 +58,7 @@ kbs_in_mb = 1000
 ###
 ### Setup the Kafka producer and load the message schema
 ###
+print('Connecting to Kafka @ {}' .format(kafka_servers))
 
 p = Producer({'bootstrap.servers': kafka_servers})
 
@@ -92,7 +93,8 @@ def delivery_report(err, msg):
         total_payloads_sent += 1
         
         current_time = int(time.time())
-        
+        print('Recieved message @ '.format(current_time))        
+
         if current_time != rate_current_second:
             # We are in a new second, we can reset rate throttling
             rate_exceeded = False
