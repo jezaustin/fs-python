@@ -42,6 +42,8 @@ kbs_so_far = 0
 
 window_start_time = int(time.time())
 
+timestamps = []
+
 while True:
     
     # Waits 1 second to receive a message, if it doesn't find one goes round the loop again
@@ -52,6 +54,8 @@ while True:
     if msg.error():
         print("Consumer error: {}".format(msg.error()))
         continue
+
+    timestamps.push(msg.timestamp()[1])
     
     current_time = int(time.time())
             
@@ -68,5 +72,10 @@ while True:
         window_start_time = int(time.time())
         kbs_so_far = 0
     
-
 c.close()
+
+# analyze timestamps
+print ("minimum timestamp: {}".format(min(timestamps)))
+offsets = [t - min(timestamps) for t in timestamps]
+lateness = [abs(offsets[i] - i) for i in range(offsets)]
+print ("maximum lateness: {}".format(max(lateness)))

@@ -181,7 +181,8 @@ for i in range(payloads_to_send):
               key=None,             # Could remove partition property and specify key to determine partition
               value=payload,
               partition=sensor_id,  # Hard codes the partition to write to
-              callback=delivery_report)
+              callback=delivery_report,
+              timestamp=start_time - payloads_to_send + i) # emulate one msg per second up to start_time
     
     # Flush periodically so we can manage data rates effectively.
     # Produce is async so can get way ahead of writes actually being ack'd by Kafka.  If we don't do this
