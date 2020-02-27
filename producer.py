@@ -36,7 +36,8 @@ throughput_debug_interval_in_sec = 1
 max_payloads_before_flush = 5
 
 # Address of the kafka servers and topic name
-kafka_servers = '192.168.56.101:9092'
+#kafka_servers = '192.168.56.101:9092'
+kafka_servers = 'internal-service-0.kafka.svc.cluster.local:32400,internal-service-1.kafka.svc.cluster.local:32401,internal-service-2.kafka.svc.cluster.local:32402'
 topic_name = 'test'
 
 
