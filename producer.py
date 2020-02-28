@@ -4,6 +4,7 @@
 # -*- coding: utf-8 -*-
 
 import io, random
+import os
 
 from confluent_kafka import Producer
 import avro.schema
@@ -18,7 +19,7 @@ import time
 sensor_id = 0
 
 # Approximate size of message payload required to be sent in KB
-payload_size_in_kb = 75
+payload_size_in_kb = os.environ("MESSAGE_SIZE_KB") or 75
 
 # Total data to send in KB, will determine how long the producer runs for
 total_data_to_send_in_kb = 750000
