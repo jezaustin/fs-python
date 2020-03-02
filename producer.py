@@ -156,7 +156,7 @@ start_time = int(time.time())
 window_start_time = int(time.time())
 rate_current_second = int(time.time())
 
-While True:
+while True:
   for i in range(payloads_to_send):
             
     # Trigger any available delivery report callbacks from previous produce() calls
