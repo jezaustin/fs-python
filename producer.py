@@ -65,7 +65,7 @@ print('Connecting to Kafka @ {}' .format(kafka_servers))
 p = Producer({'bootstrap.servers': kafka_servers})
 
 # Read the schema for the sensor readings, each message contains an array of readings
-schema_path="readings.avsc"
+schema_path="/etc/git-repo/readings.avsc"
 schema = avro.schema.Parse(open(schema_path).read())
 
 
