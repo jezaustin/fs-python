@@ -90,7 +90,7 @@ print ("maximum lateness: {}".format(max(lateness)))
 
 def report(endpoint_url, current_time, throughput_mb_per_s):
   if endpoint_url.startswith("http://"):
-    payload=dict([("timestamp": current_time, "throughput": throughput_mb_per_s)])
+    payload=dict(timestamp=current_time, throughput=throughput_mb_per_s)
     post(endpoint_url, payload)
   else:
     print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
