@@ -14,7 +14,7 @@ from confluent_kafka import Consumer
 ###
 
 # currently posts to endpoint using requests: https://2.python-requests.org/en/v2.9.1/
-endpoint_url=os.environ("ENDPOINT_URL") or "print"
+endpoint_url=os.environ["ENDPOINT_URL"] or "print"
 
 # Address of the kafka servers and topic name
 #kafka_servers = '192.168.56.101:9092'
