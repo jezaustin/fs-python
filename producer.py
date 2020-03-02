@@ -156,7 +156,8 @@ start_time = int(time.time())
 window_start_time = int(time.time())
 rate_current_second = int(time.time())
 
-for i in range(payloads_to_send):
+While True:
+  for i in range(payloads_to_send):
             
     # Trigger any available delivery report callbacks from previous produce() calls
     # Required as produce is asynchronous, polling tells us when a message has been sent
@@ -193,12 +194,12 @@ for i in range(payloads_to_send):
     if (i+1) % max_payloads_before_flush == 0:
         p.flush()
 
-# Wait for any outstanding messages to be delivered and delivery report
-# callbacks to be triggered.
-p.flush()
+  # Wait for any outstanding messages to be delivered and delivery report
+  # callbacks to be triggered.
+  p.flush()
 
-end_time = int(time.time())
+  end_time = int(time.time())
 
-print('Total payloads sent: {}'.format(total_payloads_sent))
-print('Total data sent: {} MB'.format(int((total_payloads_sent*payload_size_in_kb)/1000)))
-print('Total time taken: {} seconds'.format(end_time - start_time))
+  print('Total payloads sent: {}'.format(total_payloads_sent))
+  print('Total data sent: {} MB'.format(int((total_payloads_sent*payload_size_in_kb)/1000)))
+  print('Total time taken: {} seconds'.format(end_time - start_time))
