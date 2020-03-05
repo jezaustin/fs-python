@@ -21,11 +21,12 @@ sensor_id = 0
 # Approximate size of message payload required to be sent in KB
 payload_size_in_kb = int(os.environ["MESSAGE_SIZE_KB"]) or 75
 
-# Total data to send in KB, will determine how long the producer runs for
-total_data_to_send_in_kb = 750000
-
 # Upper limit on amount of data that should be sent per time interval (in KB/s)
 upper_data_rate_limit_kbs = 75000 
+
+# Total data to send in KB, will determine how long the producer runs for
+# i.e 3 hours of data at specified upper rate
+total_data_to_send_in_kb = upper_data_rate_limit_kbs * 60 * 60 * 3 
 
 # How often to indicate data rate in seconds
 throughput_debug_interval_in_sec = 1
@@ -38,9 +39,8 @@ max_payloads_before_flush = 5
 
 # Address of the kafka servers and topic name
 #kafka_servers = '192.168.56.101:9092'
-kafka_servers = 'internal-service-0.kafka.svc.cluster.local:32400,internal-service-1.kafka.svc.cluster.local:32401,internal-service-2.kafka.svc.cluster.local:32402'
+kafka_servers = 'internal-service-0.kafka.svc.cluster.local:32400'
 topic_name = 'test'
-
 
 ###
 ### Do not change the below, use the configuration to calculate some settings
@@ -156,43 +156,42 @@ start_time = int(time.time())
 window_start_time = int(time.time())
 rate_current_second = int(time.time())
 
-while True:
-  for i in range(payloads_to_send):
+for i in range(payloads_to_send):
             
-    # Trigger any available delivery report callbacks from previous produce() calls
-    # Required as produce is asynchronous, polling tells us when a message has been sent
-    p.poll(0)
+  # Trigger any available delivery report callbacks from previous produce() calls
+  # Required as produce is asynchronous, polling tells us when a message has been sent
+  p.poll(0)
     
-    # Check for rate being exceeded, i.e. we are sending data too quickly
-    while rate_exceeded:
-        
-        # Sleep for 10 msec
-        time.sleep(0.01)
-        
-        # Check the current time
-        current_time = int(time.time())
-        
-        # Remove rate limiting if we are in a new second
-        if current_time != rate_current_second:
-            rate_exceeded = False
-            rate_for_second_so_far = 0
+  # Check for rate being exceeded, i.e. we are sending data too quickly
+  while rate_exceeded:
+      
+      # Sleep for 10 msec
+      time.sleep(0.01)
+      
+      # Check the current time
+      current_time = int(time.time())
+      
+      # Remove rate limiting if we are in a new second
+      if current_time != rate_current_second:
+          rate_exceeded = False
+          rate_for_second_so_far = 0
 
-    # Asynchronously produce a message, the delivery report callback
-    # will be triggered from poll() above, or flush() below, when the message has
-    # been successfully delivered or failed permanently.
-    p.produce(topic=topic_name,
-              key=None,             # Could remove partition property and specify key to determine partition
-              value=payload,
-              partition=sensor_id,  # Hard codes the partition to write to
-              callback=delivery_report,
-              timestamp=start_time - payloads_to_send + i) # emulate one msg per second up to start_time
-    
-    # Flush periodically so we can manage data rates effectively.
-    # Produce is async so can get way ahead of writes actually being ack'd by Kafka.  If we don't do this
-    # then we can't manage the data rate effectively.
-    # The flush rate may need tuning.
-    if (i+1) % max_payloads_before_flush == 0:
-        p.flush()
+  # Asynchronously produce a message, the delivery report callback
+  # will be triggered from poll() above, or flush() below, when the message has
+  # been successfully delivered or failed permanently.
+  p.produce(topic=topic_name,
+            key=None,             # Could remove partition property and specify key to determine partition
+            value=payload,
+            partition=sensor_id,  # Hard codes the partition to write to
+            callback=delivery_report,
+            timestamp=start_time - payloads_to_send + i) # emulate one msg per second up to start_time
+  
+  # Flush periodically so we can manage data rates effectively.
+  # Produce is async so can get way ahead of writes actually being ack'd by Kafka.  If we don't do this
+  # then we can't manage the data rate effectively.
+  # The flush rate may need tuning.
+  if (i+1) % max_payloads_before_flush == 0:
+      p.flush()
 
   # Wait for any outstanding messages to be delivered and delivery report
   # callbacks to be triggered.
