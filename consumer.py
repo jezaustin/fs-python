@@ -61,7 +61,7 @@ while True:
         print("Consumer error: {}".format(msg.error()))
         continue
 
-    timestamps.push(msg.timestamp()[1])
+    timestamps.append(msg.timestamp()[1])
     
     current_time = int(time.time())
             
