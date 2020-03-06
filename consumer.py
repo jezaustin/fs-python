@@ -18,10 +18,7 @@ endpoint_url=os.environ["ENDPOINT_URL"] or "print"
 
 # Address of the kafka servers and topic name
 #kafka_servers = '192.168.56.101:9092'
-kafka_servers = ",".join([
-  "internal-service-{}.kafka.svc.cluster.local:{}".format(i, 32400+i)
-  for i in range(3)
-])
+kafka_servers = 'internal-service-0.kafka.svc.cluster.local:32400'
 topic_name = 'test'
 
 # Whether to only listen for messages that occurred since the consumer started ('latest'),
@@ -30,7 +27,7 @@ topic_name = 'test'
 read_topic_from = 'latest'
 
 # How often to indicate data rate in seconds
-throughput_debug_interval_in_sec = 1
+throughput_debug_interval_in_sec = 5 
 
 ###
 ### Consumer code
@@ -64,7 +61,7 @@ while True:
         print("Consumer error: {}".format(msg.error()))
         continue
 
-    timestamps.push(msg.timestamp()[1])
+    timestamps.append(msg.timestamp()[1])
     
     current_time = int(time.time())
             
