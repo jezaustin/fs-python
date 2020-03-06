@@ -18,7 +18,10 @@ endpoint_url=os.environ["ENDPOINT_URL"] or "print"
 
 # Address of the kafka servers and topic name
 #kafka_servers = '192.168.56.101:9092'
-kafka_servers = 'internal-service-0.kafka.svc.cluster.local:32400,internal-service-1.kafka.svc.cluster.local:32401,internal-service-2.kafka.svc.cluster.local:32402'
+kafka_servers = ",".join([
+  "internal-service-{}.kafka.svc.cluster.local:{}".format(i, 32400+i)
+  for i in range(3)
+])
 topic_name = 'test'
 
 # Whether to only listen for messages that occurred since the consumer started ('latest'),
@@ -74,23 +77,26 @@ while True:
     if window_length_sec >= throughput_debug_interval_in_sec:
         throughput_mb_per_s = int(kbs_so_far / (throughput_debug_interval_in_sec*kbs_in_mb))
         # print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
-        report(endpoint_url, current_time, throughput_mb_per_s)
+        report(endpoint_url, current_time, throughput_mb_per_s, timestamps)
 
         # Reset ready for the next throughput indication
         window_start_time = int(time.time())
         kbs_so_far = 0
+        timestamps = []
     
 c.close()
 
-# analyze timestamps
-print ("minimum timestamp: {}".format(min(timestamps)))
-offsets = [t - min(timestamps) for t in timestamps]
-lateness = [abs(offsets[i] - i) for i in range(offsets)]
-print ("maximum lateness: {}".format(max(lateness)))
-
-def report(endpoint_url, current_time, throughput_mb_per_s):
+def report(endpoint_url, current_time, throughput_mb_per_s, timestamps):
   if endpoint_url.startswith("http://"):
-    payload=dict(timestamp=current_time, throughput=throughput_mb_per_s)
+    min_ts = min(timestamps)
+    offsets = [t - min_ts for t in timestamps]
+    lateness = [abs(offsets[i] - i) for i in range(offsets)]
+    payload=dict(
+      timestamp = current_time,
+      throughput = throughput_mb_per_s,
+      min_timestamp = min(timestamps),
+      max_lateness = max(lateness)
+    )
     post(endpoint_url, payload)
   else:
     print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
