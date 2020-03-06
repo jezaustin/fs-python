@@ -15,6 +15,7 @@ from confluent_kafka import Consumer
 
 # currently posts to endpoint using requests: https://2.python-requests.org/en/v2.9.1/
 endpoint_url=os.environ["ENDPOINT_URL"] or "print"
+consumer_id=os.environ["POD_NAME"] or "unknown"
 
 # Address of the kafka servers and topic name
 #kafka_servers = '192.168.56.101:9092'
@@ -49,6 +50,13 @@ kbs_so_far = 0
 window_start_time = int(time.time())
 
 timestamps = []
+
+
+post(endpoint_url, dict(
+    timestamp = window_start_time,
+    message = "consumer initialized",
+    id = consumer_id
+))
 
 while True:
     
@@ -92,7 +100,8 @@ def report(endpoint_url, current_time, throughput_mb_per_s, timestamps):
       timestamp = current_time,
       throughput = throughput_mb_per_s,
       min_timestamp = min(timestamps),
-      max_lateness = max(lateness)
+      max_lateness = max(lateness),
+      id = consumer_id
     )
     post(endpoint_url, payload)
   else:
