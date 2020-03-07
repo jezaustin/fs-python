@@ -111,8 +111,4 @@ while True:
         kbs_so_far = 0
         timestamps = []
 
-<<<<<<< HEAD
-=======
 c.close()
-
->>>>>>> e8c28b8860c9e23ea0bac80c5f04188cb55c7319
