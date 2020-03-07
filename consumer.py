@@ -102,7 +102,7 @@ while True:
     window_length_sec = current_time - window_start_time
 
     if window_length_sec >= throughput_debug_interval_in_sec:
-        throughput_mb_per_s = int(kbs_so_far / (throughput_debug_interval_in_sec*kbs_in_mb))
+        throughput_mb_per_s = float(kbs_so_far / (throughput_debug_interval_in_sec*kbs_in_mb))
         # print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
         report(endpoint_url, current_time, throughput_mb_per_s, timestamps)
 
