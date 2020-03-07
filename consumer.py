@@ -19,7 +19,7 @@ def report(endpoint_url, current_time, throughput_mb_per_s, timestamps):
   if endpoint_url.startswith("http://"):
     min_ts = min(timestamps)
     offsets = [t - min_ts for t in timestamps]
-    lateness = [abs(offsets[i] - i) for i in range(offsets)]
+    lateness = [abs(offsets[i] - i) for i in range(len(offsets))]
     payload=dict(
       timestamp = current_time,
       throughput = throughput_mb_per_s,
