@@ -4,7 +4,8 @@
 import os
 import sys
 import time
-import requests 
+import requests
+import json
 
 from confluent_kafka import Consumer
 
