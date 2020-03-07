@@ -20,7 +20,7 @@ def post(endpoint_url,payload):
 ###
 
 # currently posts to endpoint using requests: https://2.python-requests.org/en/v2.9.1/
-endpoint_url=os.environ["ENDPOINT_URL"] or "print"
+endpoint_url="http://focussensors.duckdns.org:900/consumer_reporting_endpoint"
 consumer_id=os.environ["POD_NAME"] or "unknown"
 
 # Address of the kafka servers and topic name
