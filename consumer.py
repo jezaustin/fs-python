@@ -50,7 +50,7 @@ topic_name = 'test'
 read_topic_from = 'latest'
 
 # How often to indicate data rate in seconds
-throughput_debug_interval_in_sec = 5 
+throughput_debug_interval_in_sec = 5
 
 ###
 ### Consumer code
@@ -81,7 +81,7 @@ post(endpoint_url, dict(
 ))
 
 while True:
-    
+
     # Waits 1 second to receive a message, if it doesn't find one goes round the loop again
     msg = c.poll(1.0)
 
@@ -92,15 +92,15 @@ while True:
         continue
 
     timestamps.append(msg.timestamp()[1])
-    
+
     current_time = int(time.time())
-            
+
     # Maintain figures for throughput reporting
     kbs_so_far += sys.getsizeof(msg.value())/1000
-    
+
     # Determine if we should output a throughput figure
     window_length_sec = current_time - window_start_time
-    
+
     if window_length_sec >= throughput_debug_interval_in_sec:
         throughput_mb_per_s = int(kbs_so_far / (throughput_debug_interval_in_sec*kbs_in_mb))
         # print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
@@ -110,6 +110,9 @@ while True:
         window_start_time = int(time.time())
         kbs_so_far = 0
         timestamps = []
-    
+
+<<<<<<< HEAD
+=======
 c.close()
 
+>>>>>>> e8c28b8860c9e23ea0bac80c5f04188cb55c7319
