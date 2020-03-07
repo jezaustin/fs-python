@@ -91,13 +91,7 @@ window_start_time = int(time.time())
 
 timestamps = dict()
 
-print(f"Connecting to endpoint={endpoint_url}")
-
-post(endpoint_url, dict(
-    timestamp = window_start_time,
-    message = "consumer initialized",
-    id = consumer_id
-))
+print(f"endpoint={endpoint_url}")
 
 while True:
 
