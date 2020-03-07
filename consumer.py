@@ -40,7 +40,7 @@ def report(endpoint_url, current_time, throughput_mb_per_s, timestamps):
     payload=dict(
       timestamp = current_time,
       throughput = throughput_mb_per_s,
-      min_timestamp = min(timestamps),
+      #min_timestamp = min(timestamps),
       max_lateness = max(max_lateness),
       id = consumer_id
     )
