@@ -8,6 +8,11 @@ import requests
 
 from confluent_kafka import Consumer
 
+# equivalent to: curl endpoint --header "Content-Type: application/json" --request POST --data data endpoint_url
+def post(endpoint_url,payload):
+  # uses lib requests
+  headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+  request = requests.post(endpoint_url, data=json.dumps(payload), headers=headers)
 
 ###
 ### PLEASE SET THE BELOW CONFIGURATION
@@ -107,8 +112,3 @@ def report(endpoint_url, current_time, throughput_mb_per_s, timestamps):
   else:
     print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
 
-# equivalent to: curl endpoint --header "Content-Type: application/json" --request POST --data data endpoint_url
-def post(endpoint_url,payload):
-  # uses lib requests
-  headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-  request = requests.post(endpoint_url, data=json.dumps(payload), headers=headers)
