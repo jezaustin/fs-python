@@ -16,7 +16,7 @@ import time
 ###
 
 # ID of this sensor, used to determine what partition to write to
-sensor_id = 0
+sensor_id = os.environ["POD_NAME"] 
 
 # Approximate size of message payload required to be sent in KB
 payload_size_in_kb = int(os.environ["MESSAGE_SIZE_KB"]) or 75
