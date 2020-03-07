@@ -16,7 +16,7 @@ import time
 ###
 
 # ID of this sensor, used to determine what partition to write to
-sensor_id = 0
+sensor_id = int(os.environ["SENSOR_ID"])
 
 # Approximate size of message payload required to be sent in KB
 payload_size_in_kb = int(os.environ["MESSAGE_SIZE_KB"]) or 75
@@ -40,7 +40,8 @@ max_payloads_before_flush = 5
 # Address of the kafka servers and topic name
 #kafka_servers = '192.168.56.101:9092'
 kafka_servers = 'internal-service-0.kafka.svc.cluster.local:32400'
-topic_name = 'test'
+#topic_name = 'test'
+topic_name = 'sensor{}'.format(sensor_id)
 
 ###
 ### Do not change the below, use the configuration to calculate some settings
@@ -182,7 +183,7 @@ for i in range(payloads_to_send):
   p.produce(topic=topic_name,
             key=None,             # Could remove partition property and specify key to determine partition
             value=payload,
-            partition=sensor_id,  # Hard codes the partition to write to
+            #partition=sensor_id,  # Hard codes the partition to write to
             callback=delivery_report,
             timestamp=start_time - payloads_to_send + i) # emulate one msg per second up to start_time
   

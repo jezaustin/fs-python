@@ -17,14 +17,31 @@ def post(endpoint_url,payload):
 
 def report(endpoint_url, current_time, throughput_mb_per_s, timestamps):
   if endpoint_url.startswith("http://"):
-    min_ts = min(timestamps)
-    offsets = [t - min_ts for t in timestamps]
-    lateness = [abs(offsets[i] - i) for i in range(len(offsets))]
+    topics = timestamps.keys()
+    min_ts = {
+      topic:min(timestamps[topic])
+      for topic in topics
+    }
+    #min_ts = min(timestamps)
+    offsets = {
+      topic:[t - min_ts[topic] for t in timestamps[topic]]
+      for topic in topics
+    }
+    #offsets = [t - min_ts for t in timestamps]
+    lateness = {
+      topic: [abs(offsets[topic][i] - i) for i in range(len(offsets[topic]))]
+      for topic in topics
+    }
+    #lateness = [abs(offsets[i] - i) for i in range(len(offsets))]
+    max_lateness = [
+      max(lateness[topic])
+      for topic in topics
+    ]
     payload=dict(
       timestamp = current_time,
       throughput = throughput_mb_per_s,
       min_timestamp = min(timestamps),
-      max_lateness = max(lateness),
+      max_lateness = max(max_lateness),
       id = consumer_id
     )
     post(endpoint_url, payload)
@@ -42,7 +59,8 @@ consumer_id=os.environ["POD_NAME"] or "unknown"
 # Address of the kafka servers and topic name
 #kafka_servers = '192.168.56.101:9092'
 kafka_servers = 'internal-service-0.kafka.svc.cluster.local:32400'
-topic_name = 'test'
+#topic_name = 'test'
+topic_name = "^sensor[0-9]"
 
 # Whether to only listen for messages that occurred since the consumer started ('latest'),
 # or to pick up all messages that the consumer has missed ('earliest').
@@ -71,7 +89,7 @@ kbs_so_far = 0
 
 window_start_time = int(time.time())
 
-timestamps = []
+timestamps = dict()
 
 
 post(endpoint_url, dict(
@@ -91,7 +109,10 @@ while True:
         print("Consumer error: {}".format(msg.error()))
         continue
 
-    timestamps.append(msg.timestamp()[1])
+    if msg.topic in timestamps:
+      timestamps[msg.topic].append(msg.timestamp()[1])
+    else:
+      timestamps[msg.topic] = [msg.timestamp()[1]]
 
     current_time = int(time.time())
 
@@ -109,6 +130,6 @@ while True:
         # Reset ready for the next throughput indication
         window_start_time = int(time.time())
         kbs_so_far = 0
-        timestamps = []
+        timestamps = dict()
 
 c.close()
