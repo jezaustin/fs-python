@@ -40,8 +40,8 @@ max_payloads_before_flush = 5
 # Address of the kafka servers and topic name
 #kafka_servers = '192.168.56.101:9092'
 kafka_servers = 'internal-service-0.kafka.svc.cluster.local:32400'
-#topic_name = 'test'
-topic_name = 'sensor{}'.format(sensor_id)
+topic_name = 'test'
+#topic_name = 'sensor{}'.format(sensor_id)
 
 ###
 ### Do not change the below, use the configuration to calculate some settings
