@@ -80,7 +80,8 @@ print('Connecting to Kafka @ {}'.format(kafka_servers))
 c = Consumer({
     'bootstrap.servers': kafka_servers,
     'group.id': 'mygroup',
-    'auto.offset.reset': read_topic_from
+    'auto.offset.reset': read_topic_from,
+    'metadata.max.age.ms': 5000
 })
 
 last_subscribe_time = int(time.time())
@@ -116,7 +117,7 @@ while True:
     current_time = int(time.time())
 
     if 10 < current_time - last_subscribe_time:
-      c.subscribe([topic_name])
+      #c.subscribe([topic_name])
       print("number of nomsgs: {}", nomsg_count)
       nomsg_count = 0
 
