@@ -59,8 +59,8 @@ consumer_id=os.environ["POD_NAME"] or "unknown"
 # Address of the kafka servers and topic name
 #kafka_servers = '192.168.56.101:9092'
 kafka_servers = 'internal-service-0.kafka.svc.cluster.local:32400'
-#topic_name = 'test'
-topic_name = "^sensor.*"
+topic_name = 'test'
+#topic_name = "^sensor.*"
 
 # Whether to only listen for messages that occurred since the consumer started ('latest'),
 # or to pick up all messages that the consumer has missed ('earliest').
