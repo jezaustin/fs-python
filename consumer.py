@@ -59,8 +59,9 @@ consumer_id=os.environ["POD_NAME"] or "unknown"
 # Address of the kafka servers and topic name
 #kafka_servers = '192.168.56.101:9092'
 kafka_servers = 'internal-service-0.kafka.svc.cluster.local:32400'
-topic_name = 'test'
+#topic_name = 'test'
 #topic_name = "^sensor.*"
+topic_name = ["sensor{}".format(i) for i in range(5)]
 
 # Whether to only listen for messages that occurred since the consumer started ('latest'),
 # or to pick up all messages that the consumer has missed ('earliest').
@@ -85,7 +86,7 @@ c = Consumer({
 })
 
 last_subscribe_time = int(time.time())
-c.subscribe([topic_name])
+c.subscribe(topic_name)
 nomsg_count = 0
 
 kbs_so_far = 0
@@ -107,7 +108,7 @@ while True:
         #print("No message")
         nomsg_count = nomsg_count + 1
         if 10 < current_time - last_subscribe_time:
-          c.subscribe([topic_name])
+          #c.subscribe([topic_name])
           print("number of nomsgs: {}".format(nomsg_count))
           last_subscribe_time = current_time
         continue
@@ -121,7 +122,7 @@ while True:
       timestamps[msg.topic] = [msg.timestamp()[1]]
 
     if 10 < current_time - last_subscribe_time:
-      c.subscribe([topic_name])
+      #c.subscribe([topic_name])
       print("number of nomsgs: {}".format(nomsg_count))
       nomsg_count = 0
       last_subscribe_time = current_time

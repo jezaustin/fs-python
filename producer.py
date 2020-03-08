@@ -10,13 +10,14 @@ from confluent_kafka import Producer
 import avro.schema
 import avro.io
 import time
+import requests
 
 ###
 ### PLEASE SET THE BELOW CONFIGURATION
 ###
 
 # ID of this sensor, used to determine what partition to write to
-sensor_id = os.environ["POD_UID"][0:4]
+#sensor_id = os.environ["POD_UID"][0:4]
 
 # Approximate size of message payload required to be sent in KB
 payload_size_in_kb = int(os.environ["MESSAGE_SIZE_KB"]) or 75
@@ -40,8 +41,15 @@ max_payloads_before_flush = 5
 # Address of the kafka servers and topic name
 #kafka_servers = '192.168.56.101:9092'
 kafka_servers = 'internal-service-0.kafka.svc.cluster.local:32400'
-topic_name = 'test'
-#topic_name = 'sensor{}'.format(sensor_id)
+#topic_name = 'test'
+endpoint_url="http://focussensors.duckdns.org:9000/producer_id"
+headers={'Accept': 'text/plain'}
+response = requests.get(endpoint_url, headers)
+if response.status_code != 200:
+    sys.exit("Could not get sensor_id: {}".format(response.status_code))
+response.encoding='utf-8'
+sensor_id=response.text
+topic_name = 'sensor{}'.format(sensor_id)
 
 ###
 ### Do not change the below, use the configuration to calculate some settings
