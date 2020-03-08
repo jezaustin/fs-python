@@ -120,7 +120,7 @@ while True:
       #c.subscribe([topic_name])
       print("number of nomsgs: {}", nomsg_count)
       nomsg_count = 0
-      last_subscibe_time = current_time
+      last_subscribe_time = current_time
 
     # Maintain figures for throughput reporting
     kbs_so_far += sys.getsizeof(msg.value())/1000
