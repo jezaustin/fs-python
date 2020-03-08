@@ -11,6 +11,7 @@ import avro.schema
 import avro.io
 import time
 import requests
+import json
 
 ###
 ### PLEASE SET THE BELOW CONFIGURATION
@@ -48,7 +49,7 @@ response = requests.get(endpoint_url, headers)
 if response.status_code != 200:
     sys.exit("Could not get sensor_id: {}".format(response.status_code))
 response.encoding='utf-8'
-sensor_id=response.text
+sensor_id=json.loads(response.text).producer_id
 topic_name = 'sensor{}'.format(sensor_id)
 
 ###
