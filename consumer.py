@@ -97,7 +97,7 @@ timestamps = dict()
 print(f"endpoint={endpoint_url}")
 print("outside loop")
 while True:
-    print("inside loop")
+    #print("inside loop")
     # Waits 1 second to receive a message, if it doesn't find one goes round the loop again
     msg = c.poll(1.0)
 
@@ -119,6 +119,7 @@ while True:
     print("time elapsed: {}".format(current_time - last_subscribe_time))
     
     if 10 < current_time - last_subscribe_time:
+      print("every 10s")
       #c.subscribe([topic_name])
       print("number of nomsgs: {}".format(nomsg_count))
       nomsg_count = 0
