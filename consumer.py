@@ -85,6 +85,7 @@ c = Consumer({
 
 last_subscribe_time = int(time.time())
 c.subscribe([topic_name])
+nomsg_count = 0
 
 kbs_so_far = 0
 
@@ -100,7 +101,8 @@ while True:
     msg = c.poll(1.0)
 
     if msg is None:
-        print("No message")
+        #print("No message")
+        nomsg_count = nomsg_count + 1
         continue
     if msg.error():
         print("Consumer error: {}".format(msg.error()))
@@ -113,8 +115,10 @@ while True:
 
     current_time = int(time.time())
 
-    if false and 10 < current_time - last_subscribe_time:
-      c.subscribe([topic_name])
+    if 10 < current_time - last_subscribe_time:
+      #c.subscribe([topic_name])
+      print("number of nomsgs: {}", nomsg_count)
+      nomsg_count = 0
 
     # Maintain figures for throughput reporting
     kbs_so_far += sys.getsizeof(msg.value())/1000
