@@ -118,7 +118,7 @@ while True:
 
     if 10 < current_time - last_subscribe_time:
       #c.subscribe([topic_name])
-      print("number of nomsgs: {}", nomsg_count)
+      print("number of nomsgs: {}".format(nomsg_count))
       nomsg_count = 0
       last_subscribe_time = current_time
 
