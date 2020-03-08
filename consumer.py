@@ -95,9 +95,9 @@ window_start_time = int(time.time())
 timestamps = dict()
 
 print(f"endpoint={endpoint_url}")
-
+print("outside loop")
 while True:
-
+    print("inside loop")
     # Waits 1 second to receive a message, if it doesn't find one goes round the loop again
     msg = c.poll(1.0)
 
