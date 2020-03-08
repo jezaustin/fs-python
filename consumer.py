@@ -105,7 +105,7 @@ while True:
         #print("No message")
         nomsg_count = nomsg_count + 1
         #continue
-    if msg.error():
+    elif msg.error():
         print("Consumer error: {}".format(msg.error()))
         continue
 
