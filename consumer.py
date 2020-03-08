@@ -108,11 +108,11 @@ while True:
     elif msg.error():
         print("Consumer error: {}".format(msg.error()))
         continue
-
-    if msg.topic in timestamps:
-      timestamps[msg.topic].append(msg.timestamp()[1])
     else:
-      timestamps[msg.topic] = [msg.timestamp()[1]]
+      if msg.topic in timestamps:
+        timestamps[msg.topic].append(msg.timestamp()[1])
+      else:
+        timestamps[msg.topic] = [msg.timestamp()[1]]
 
     current_time = int(time.time())
 
@@ -124,6 +124,8 @@ while True:
       print("number of nomsgs: {}".format(nomsg_count))
       nomsg_count = 0
       last_subscribe_time = current_time
+      if msg is None:
+        continue
 
     # Maintain figures for throughput reporting
     kbs_so_far += sys.getsizeof(msg.value())/1000
