@@ -116,6 +116,8 @@ while True:
 
     current_time = int(time.time())
 
+    print("time elapsed: {}".format(current_time - last_subscribe_time))
+    
     if 10 < current_time - last_subscribe_time:
       #c.subscribe([topic_name])
       print("number of nomsgs: {}".format(nomsg_count))
