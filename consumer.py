@@ -83,6 +83,7 @@ c = Consumer({
     'auto.offset.reset': read_topic_from
 })
 
+last_subscribe_time = int(time.time())
 c.subscribe([topic_name])
 
 kbs_so_far = 0
@@ -110,6 +111,9 @@ while True:
       timestamps[msg.topic] = [msg.timestamp()[1]]
 
     current_time = int(time.time())
+
+    if 10 < current_time - last_subscribe_time:
+      c.subscribe([topic_name])
 
     # Maintain figures for throughput reporting
     kbs_so_far += sys.getsizeof(msg.value())/1000
