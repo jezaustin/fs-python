@@ -107,7 +107,8 @@ while True:
         #print("No message")
         nomsg_count = nomsg_count + 1
         if 10 < current_time - last_subscribe_time:
-          print("every 10s")
+          c.subscribe([topic_name])
+          print("number of nomsgs: {}".format(nomsg_count))
           last_subscribe_time = current_time
         continue
     if msg.error():
@@ -120,7 +121,7 @@ while True:
       timestamps[msg.topic] = [msg.timestamp()[1]]
 
     if 10 < current_time - last_subscribe_time:
-      #c.subscribe([topic_name])
+      c.subscribe([topic_name])
       print("number of nomsgs: {}".format(nomsg_count))
       nomsg_count = 0
       last_subscribe_time = current_time
