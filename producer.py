@@ -70,7 +70,7 @@ kbs_in_mb = 1000
 ###
 ### Setup the Kafka producer and load the message schema
 ###
-print('Connecting to Kafka @ {}' .format(kafka_servers))
+print('Connecting to Kafka @ {}'.format(kafka_servers))
 
 p = Producer({
     'bootstrap.servers': kafka_servers,
@@ -206,12 +206,12 @@ for i in range(payloads_to_send):
   if (i+1) % max_payloads_before_flush == 0:
       p.flush()
 
-  # Wait for any outstanding messages to be delivered and delivery report
-  # callbacks to be triggered.
-  p.flush()
+# Wait for any outstanding messages to be delivered and delivery report
+# callbacks to be triggered.
+p.flush()
 
-  end_time = int(time.time())
+end_time = int(time.time())
 
-  print('Total payloads sent: {}'.format(total_payloads_sent))
-  print('Total data sent: {} MB'.format(int((total_payloads_sent*payload_size_in_kb)/1000)))
-  print('Total time taken: {} seconds'.format(end_time - start_time))
+print('Total payloads sent: {}'.format(total_payloads_sent))
+print('Total data sent: {} MB'.format(int((total_payloads_sent*payload_size_in_kb)/1000)))
+print('Total time taken: {} seconds'.format(end_time - start_time))
