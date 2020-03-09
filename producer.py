@@ -74,7 +74,7 @@ print('Connecting to Kafka @ {}' .format(kafka_servers))
 
 p = Producer({
     'bootstrap.servers': kafka_servers,
-    'max.request.size': 75000 * 1024
+    'max.request.size': 7500 * 1024
 })
 
 # Read the schema for the sensor readings, each message contains an array of readings

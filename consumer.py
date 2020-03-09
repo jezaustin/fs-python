@@ -83,7 +83,7 @@ c = Consumer({
     'group.id': 'mygroup',
     'auto.offset.reset': read_topic_from,
     'metadata.max.age.ms': 5000,
-    'max.partition.fetch.bytes': 75000 * 1024
+    'max.partition.fetch.bytes': 7500 * 1024
 })
 
 last_subscribe_time = int(time.time())
