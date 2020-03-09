@@ -72,7 +72,10 @@ kbs_in_mb = 1000
 ###
 print('Connecting to Kafka @ {}' .format(kafka_servers))
 
-p = Producer({'bootstrap.servers': kafka_servers})
+p = Producer({
+    'bootstrap.servers': kafka_servers,
+    'max.request.size': 75000 * 1024
+})
 
 # Read the schema for the sensor readings, each message contains an array of readings
 schema_path="/etc/git-repo/readings.avsc"
