@@ -105,6 +105,7 @@ def delivery_report(err, msg):
         global rate_for_second_so_far
         global rate_exceeded
         global total_payloads_sent
+        global sensor_id
         
         total_payloads_sent += 1
         
@@ -116,7 +117,7 @@ def delivery_report(err, msg):
             rate_exceeded = False
             rate_for_second_so_far = 0 
             rate_current_second = current_time
-            print('producer_heartbeat')
+            print('producer_heartbeat {}'.format(sensor_id))
         
         # Add the payload we've sent to the total so far
         rate_for_second_so_far += payload_size_in_kb
