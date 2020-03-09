@@ -51,6 +51,7 @@ if response.status_code != 200:
 response.encoding='utf-8'
 sensor_id=json.loads(response.text)["producer_id"]
 topic_name = 'sensor{}'.format(sensor_id)
+print('Outputing to topic {}.'.format(topic_name))
 
 ###
 ### Do not change the below, use the configuration to calculate some settings
@@ -108,7 +109,7 @@ def delivery_report(err, msg):
         total_payloads_sent += 1
         
         current_time = int(time.time())
-        #print('Recieved message @ {}'.format(current_time))
+        print('Recieved message @ {}'.format(current_time))
 
         if current_time != rate_current_second:
             # We are in a new second, we can reset rate throttling
