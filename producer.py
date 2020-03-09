@@ -109,13 +109,14 @@ def delivery_report(err, msg):
         total_payloads_sent += 1
         
         current_time = int(time.time())
-        print('Recieved message @ {}'.format(current_time))
+        #print('Recieved message @ {}'.format(current_time))
 
         if current_time != rate_current_second:
             # We are in a new second, we can reset rate throttling
             rate_exceeded = False
             rate_for_second_so_far = 0 
             rate_current_second = current_time
+            print('producer_heartbeat')
         
         # Add the payload we've sent to the total so far
         rate_for_second_so_far += payload_size_in_kb
