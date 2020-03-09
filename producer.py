@@ -31,7 +31,7 @@ upper_data_rate_limit_kbs = 75000
 total_data_to_send_in_kb = upper_data_rate_limit_kbs * 60 * 60 * 3 
 
 # How often to indicate data rate in seconds
-throughput_debug_interval_in_sec = 1
+throughput_debug_interval_in_sec = 10
 
 # The kafka producer produce method is async so can get way ahead of writes actually being ack'd by Kafka
 # If we don't do this then we can't manage the data rate coming out of this process effectively.
@@ -108,7 +108,7 @@ def delivery_report(err, msg):
         total_payloads_sent += 1
         
         current_time = int(time.time())
-        print('Recieved message @ '.format(current_time))        
+        #print('Recieved message @ {}'.format(current_time))
 
         if current_time != rate_current_second:
             # We are in a new second, we can reset rate throttling
