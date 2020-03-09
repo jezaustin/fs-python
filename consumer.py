@@ -80,7 +80,7 @@ kbs_in_mb = 1000
 print('Connecting to Kafka @ {}'.format(kafka_servers))
 c = Consumer({
     'bootstrap.servers': kafka_servers,
-    'group.id': 'mygroup',
+    'group.id': consumer_id,#'mygroup',
     'auto.offset.reset': read_topic_from,
     'metadata.max.age.ms': 5000,
     'max.partition.fetch.bytes': 7500 * 1024
