@@ -3,12 +3,14 @@
 ##!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import io, random
 import socket
 import time
 import avro.io
 import avro.schema
 import sys
+import numpy
 
 # 75Kb
 MESSAGE_SIZE_KB = 75 * 1000
@@ -125,20 +127,25 @@ def delivery_report(err, msg):
 # Note upper bound is (2**20)-1 and not (2**21)-
 print(f"Generating {payload_in_num_of_ints} ints...")
 now = int(time.time())
-random_ints = [random.randint(2 ** 14, (2 ** 20) - 1) for i in range(payload_in_num_of_ints)]
+#random_ints = [random.randint(2 ** 14, (2 ** 20) - 1) for i in range(payload_in_num_of_ints)]
+# note - numpy.random.randint returns ndarray, not python array!
+random_ints_ndarray = numpy.random.randint(2 ** 14, (2 ** 20) - 1, size=payload_in_num_of_ints)
+random_ints = random_ints_ndarray.tolist()
 then = int(time.time())
-print(f"Took {then-now}s to generate.")
+print(f"Took {then-now}s to generate {payload_in_num_of_ints} ints.")
+
+# print(random_ints)
 
 writer = avro.io.DatumWriter(schema)
 bytes_writer = io.BytesIO()
 encoder = avro.io.BinaryEncoder(bytes_writer)
-print("Writing to avro.")
+print("Writing to Avro.")
 now = int(time.time())
 # see https://avro.apache.org/docs/current/spec.html#binary_encoding
 writer.write({"readings": random_ints}, encoder)
 payload = bytes_writer.getvalue()
 then = int(time.time())
-print(f"Took {then-now}s to write.")
+print(f"Took {then-now}s to write payload to Avro.")
 
 ###
 ### Start sending the payloads
@@ -149,7 +156,7 @@ window_start_time = int(time.time())
 rate_current_second = int(time.time())
 
 socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-address = "10.154.0.2"
+address=os.environ["IP_ADDRESS"]
 port = 9000
 print(f"Connecting to address {address}, port {port}")
 socket.connect((address, port))

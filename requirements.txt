@@ -2,3 +2,4 @@ avro-python3==1.9.1
 confluent-kafka==1.2.0
 #aiohttp==3.6.2
 requests==2.9.1
+numpy==1.18.2
