@@ -12,6 +12,7 @@ import avro.io
 import time
 import requests
 import json
+import numpy
 
 ###
 ### PLEASE SET THE BELOW CONFIGURATION
@@ -155,13 +156,23 @@ def delivery_report(err, msg):
 # Code below ensures 3 bytes are always used to encode an int.
 # See Vint section on http://lucene.apache.org/core/3_5_0/fileformats.html#VInt
 # Note upper bound is (2**20)-1 and not (2**21)-1 as we are using the signed rather than unsigned integer avro type.
-random_ints = [random.randint(2**14, (2**20)-1) for i in range(payload_in_num_of_ints)]
+print(f"Generating {payload_in_num_of_ints} ints...")
+now = int(time.time())
+#random_ints = [random.randint(2**14, (2**20)-1) for i in range(payload_in_num_of_ints)]
+random_ints_ndarray = numpy.random.randint(2 ** 14, (2 ** 20) - 1, size=payload_in_num_of_ints)
+random_ints = random_ints_ndarray.tolist()
+then = int(time.time())
+print(f"Took {then - now}s to generate {payload_in_num_of_ints} ints.")
 
 writer = avro.io.DatumWriter(schema)
 bytes_writer = io.BytesIO()
 encoder = avro.io.BinaryEncoder(bytes_writer)
+print("Writing to Avro.")
+now = int(time.time())
 writer.write({"readings": random_ints}, encoder)
 payload = bytes_writer.getvalue()
+then = int(time.time())
+print(f"Took {then - now}s to write payload to Avro.")
 
 ###
 ### Start sending the payloads
