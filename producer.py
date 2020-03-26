@@ -28,8 +28,7 @@ payload_size_in_kb = int(os.environ["MESSAGE_SIZE_KB"]) or 75
 upper_data_rate_limit_kbs = 75000 
 
 # Total data to send in KB, will determine how long the producer runs for
-# i.e 3 hours of data at specified upper rate
-total_data_to_send_in_kb = upper_data_rate_limit_kbs * 60 * 60 * 3 
+total_data_to_send_in_kb = upper_data_rate_limit_kbs * 60 * 15 * 1 
 
 # How often to indicate data rate in seconds
 throughput_debug_interval_in_sec = 10
