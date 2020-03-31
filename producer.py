@@ -22,7 +22,7 @@ import numpy
 #sensor_id = os.environ["POD_UID"][0:4]
 
 # Approximate size of message payload required to be sent in KB
-MESSAGE_SIZE_KB=75
+MESSAGE_SIZE_KB=750
 try:
   MESSAGE_SIZE_KB = int(os.environ["MESSAGE_SIZE_KB"])
 except:
