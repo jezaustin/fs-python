@@ -28,7 +28,7 @@ try:
 except:
   print("Missing MESSAGE_SIZE_KB as env var, using default.")
 
-payload_size_in_kb = MESSAGE_SIZE_KB" 
+payload_size_in_kb = MESSAGE_SIZE_KB 
 
 # Upper limit on amount of data that should be sent per time interval (in KB/s)
 upper_data_rate_limit_kbs = 75000 
