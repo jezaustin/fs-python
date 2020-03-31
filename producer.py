@@ -22,7 +22,13 @@ import numpy
 #sensor_id = os.environ["POD_UID"][0:4]
 
 # Approximate size of message payload required to be sent in KB
-payload_size_in_kb = int(os.environ["MESSAGE_SIZE_KB"]) or 75
+MESSAGE_SIZE_KB=75
+try:
+  MESSAGE_SIZE_KB = int(os.environ["MESSAGE_SIZE_KB"])
+except:
+  print("Missing MESSAGE_SIZE_KB as env var, using default.")
+
+payload_size_in_kb = MESSAGE_SIZE_KB" 
 
 # Upper limit on amount of data that should be sent per time interval (in KB/s)
 upper_data_rate_limit_kbs = 75000 
