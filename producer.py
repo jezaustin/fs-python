@@ -34,7 +34,7 @@ payload_size_in_kb = MESSAGE_SIZE_KB
 upper_data_rate_limit_kbs = 75000 
 
 # Total data to send in KB, will determine how long the producer runs for
-total_data_to_send_in_kb = upper_data_rate_limit_kbs * 60 * 15 * 1 
+total_data_to_send_in_kb = upper_data_rate_limit_kbs * 60 * 60 * 3 
 
 # How often to indicate data rate in seconds
 throughput_debug_interval_in_sec = 10
