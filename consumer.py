@@ -82,7 +82,7 @@ c = Consumer({
     'bootstrap.servers': kafka_servers,
     'group.id': consumer_id,#'mygroup',
     'auto.offset.reset': read_topic_from,
-    'metadata.max.age.ms': 5000,
+    #'metadata.max.age.ms': 5000,
     'max.partition.fetch.bytes': 7500 * 1024
 })
 
