@@ -101,48 +101,47 @@ print(f"endpoint={endpoint_url}")
 while True:
     #print("inside loop")
     # Waits 1 second to receive a message, if it doesn't find one goes round the loop again
-    #msg = c.poll(1.0)
-    with c.poll(1.0) as msg:
-        current_time = int(time.time())
-        #print("time elapsed: {}".format(current_time - last_subscribe_time))
+    msg = c.poll(1.0)
+    current_time = int(time.time())
+    #print("time elapsed: {}".format(current_time - last_subscribe_time))
 
-        if msg is None:
-            #print("No message")
-            nomsg_count = nomsg_count + 1
-            if 10 < current_time - last_subscribe_time:
-                #c.subscribe([topic_name])
-                print("number of nomsgs: {}".format(nomsg_count))
-                last_subscribe_time = current_time
-            continue
-        if msg.error():
-            print("Consumer error: {}".format(msg.error()))
-            continue
-
-        if msg.topic in timestamps:
-            timestamps[msg.topic].append(msg.timestamp()[1])
-        else:
-            timestamps[msg.topic] = [msg.timestamp()[1]]
-
+    if msg is None:
+        #print("No message")
+        nomsg_count = nomsg_count + 1
         if 10 < current_time - last_subscribe_time:
             #c.subscribe([topic_name])
             print("number of nomsgs: {}".format(nomsg_count))
-            nomsg_count = 0
             last_subscribe_time = current_time
+        continue
+    if msg.error():
+        print("Consumer error: {}".format(msg.error()))
+        continue
 
-        # Maintain figures for throughput reporting
-        kbs_so_far += sys.getsizeof(msg.value())/1000
+    if msg.topic in timestamps:
+        timestamps[msg.topic].append(msg.timestamp()[1])
+    else:
+        timestamps[msg.topic] = [msg.timestamp()[1]]
 
-        # Determine if we should output a throughput figure
-        window_length_sec = current_time - window_start_time
+    if 10 < current_time - last_subscribe_time:
+        #c.subscribe([topic_name])
+        print("number of nomsgs: {}".format(nomsg_count))
+        nomsg_count = 0
+        last_subscribe_time = current_time
 
-        if window_length_sec >= throughput_debug_interval_in_sec:
-            throughput_mb_per_s = float(kbs_so_far / (throughput_debug_interval_in_sec*kbs_in_mb))
-            print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
-            report(endpoint_url, current_time, throughput_mb_per_s, timestamps)
+    # Maintain figures for throughput reporting
+    kbs_so_far += sys.getsizeof(msg.value())/1000
 
-            # Reset ready for the next throughput indication
-            window_start_time = int(time.time())
-            kbs_so_far = 0
-            timestamps = dict()
+    # Determine if we should output a throughput figure
+    window_length_sec = current_time - window_start_time
+
+    if window_length_sec >= throughput_debug_interval_in_sec:
+        throughput_mb_per_s = float(kbs_so_far / (throughput_debug_interval_in_sec*kbs_in_mb))
+        print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
+        report(endpoint_url, current_time, throughput_mb_per_s, timestamps)
+
+        # Reset ready for the next throughput indication
+        window_start_time = int(time.time())
+        kbs_so_far = 0
+        timestamps = dict()
 
 c.close()
