@@ -8,8 +8,12 @@ import requests
 import json
 import resource
 import gc
+from guppy import hpy
 
 from confluent_kafka import Consumer
+
+hp = hpy()
+h = hp.heap()
 
 # equivalent to: curl endpoint --header "Content-Type: application/json" --request POST --data data endpoint_url
 def post(endpoint_url,payload):
@@ -139,7 +143,9 @@ while True:
     if window_length_sec >= throughput_debug_interval_in_sec:
         throughput_mb_per_s = float(kbs_so_far / (throughput_debug_interval_in_sec*kbs_in_mb))
         print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
-        print('Peak memory use: {} kb'.format(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss))
+        print('Peak memory use: {} Mb'.format(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/1024))
+        by_refs = h.byrcs
+        print("Heap by size {}".format(by_refs[0].bysize))
         report(endpoint_url, current_time, throughput_mb_per_s, timestamps)
 
         # Reset ready for the next throughput indication
