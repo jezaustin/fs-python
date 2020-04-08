@@ -7,6 +7,7 @@ import time
 import requests
 import json
 import resource
+import gc
 
 from confluent_kafka import Consumer
 
@@ -148,5 +149,6 @@ while True:
 
     # explicitly delete the message
     del msg
+    gc.collect()
  
 c.close()
