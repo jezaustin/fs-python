@@ -138,7 +138,7 @@ while True:
     if window_length_sec >= throughput_debug_interval_in_sec:
         throughput_mb_per_s = float(kbs_so_far / (throughput_debug_interval_in_sec*kbs_in_mb))
         print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
-        print('Peak memory use: {} kb'.resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        print('Peak memory use: {} kb'.resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
         report(endpoint_url, current_time, throughput_mb_per_s, timestamps)
 
         # Reset ready for the next throughput indication
