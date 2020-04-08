@@ -145,6 +145,8 @@ while True:
         window_start_time = int(time.time())
         kbs_so_far = 0
         timestamps = dict()
- 
 
+    # explicitly delete the message
+    del msg
+ 
 c.close()
