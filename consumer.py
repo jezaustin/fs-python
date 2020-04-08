@@ -102,7 +102,7 @@ while True:
     #print("inside loop")
     # Waits 1 second to receive a message, if it doesn't find one goes round the loop again
     #msg = c.poll(1.0)
-    with msg as c.poll(1.0):
+    with c.poll(1.0) as msg:
         current_time = int(time.time())
         #print("time elapsed: {}".format(current_time - last_subscribe_time))
 
