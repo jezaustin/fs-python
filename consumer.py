@@ -145,8 +145,9 @@ while True:
         print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
         print('Peak memory use: {} Mb'.format(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/1024))
         h = hp.heap()
-        by_refs = h.byrcs
-        print("Heap by size {}".format(by_refs[0].bysize))
+        by_types = h.bytype
+        #by_refs = h.byrcs
+        print("Heap by types {}".format(by_types))
         report(endpoint_url, current_time, throughput_mb_per_s, timestamps)
 
         # Reset ready for the next throughput indication
