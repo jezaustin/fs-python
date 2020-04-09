@@ -104,7 +104,6 @@ timestamps = dict()
 print(f"endpoint={endpoint_url}")
 #print("outside loop")
 hp.setrelheap()
-h = hp.heap()
 while True:
     #print("inside loop")
     # Waits 1 second to receive a message, if it doesn't find one goes round the loop again
@@ -145,6 +144,7 @@ while True:
         throughput_mb_per_s = float(kbs_so_far / (throughput_debug_interval_in_sec*kbs_in_mb))
         print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
         print('Peak memory use: {} Mb'.format(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/1024))
+        h = hp.heap()
         by_refs = h.byrcs
         print("Heap by size {}".format(by_refs[0].bysize))
         report(endpoint_url, current_time, throughput_mb_per_s, timestamps)
