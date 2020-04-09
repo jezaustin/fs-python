@@ -13,7 +13,6 @@ from guppy import hpy
 from confluent_kafka import Consumer
 
 hp = hpy()
-h = hp.heap()
 
 # equivalent to: curl endpoint --header "Content-Type: application/json" --request POST --data data endpoint_url
 def post(endpoint_url,payload):
@@ -104,6 +103,8 @@ timestamps = dict()
 
 print(f"endpoint={endpoint_url}")
 #print("outside loop")
+hp.setrelheap()
+h = hp.heap()
 while True:
     #print("inside loop")
     # Waits 1 second to receive a message, if it doesn't find one goes round the loop again
@@ -154,7 +155,7 @@ while True:
         timestamps = dict()
 
     # explicitly delete the message
-    del msg
-    gc.collect()
+    #del msg
+    #gc.collect()
  
 c.close()
