@@ -1,5 +1,6 @@
 import json
 import os
+import random
 import resource
 import sys
 import time
@@ -9,26 +10,25 @@ from confluent_kafka import Consumer
 from confluent_kafka.cimpl import KafkaError
 from guppy import hpy
 
+from config.base_config import BaseConfig
 from stoppable_thread import StoppableThread
 
 
 class FSConsumer(StoppableThread):
-    # default poll interval is 1s
+    THROUGHPUT_DEBUG_INTERVAL_SEC = 5
+    KBS_IN_MB = 1000
     POLL_INTERVAL = 1.0
-    throughput_debug_interval_in_sec = 5
-    kbs_in_mb = 1000
-    total_kbs = 0.0
+    _total_kbs = 0.0
 
-    def __init__(self, consumer, consumer_id, topic_name="test",
-                 endpoint_url="http://focussensors.duckdns.org:9000/consumer_reporting_endpoint", *args, **kwargs):
+    def __init__(self, consumer, consumer_id, topic_name="test", config=BaseConfig.config(), *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        print("[FSConsumer] - consumer_id={}, topic_name={}, endpoint_url={}".format(consumer_id, topic_name, endpoint_url))
-
+        self.config = config
         self.consumer = consumer
         self.consumer_id = consumer_id
         self.topic_name = topic_name
-        self.endpoint_url = endpoint_url
+
+        print("[FSConsumer] - consumer_id={}, topic_name={}, config={}".format(self.consumer_id, self.topic_name, self.config))
 
 
     def poll(self):
@@ -40,9 +40,9 @@ class FSConsumer(StoppableThread):
             return meta
 
         # returns None if no error, KafkaError otherwise
-        if message.error is KafkaError:
+        if message.error() is KafkaError:
             print("[FSConsumer] - KafkaError from client.")
-            meta['error'] = message.error
+            meta['error'] = message.error()
             return meta
 
         # extract the necessary meta (and effectively discard the message payload)
@@ -98,13 +98,13 @@ class FSConsumer(StoppableThread):
 
             # Maintain figures for throughput reporting
             kbs_so_far += message_meta['msg_size']
-            self.total_kbs += message_meta['msg_size']
+            self._total_kbs += message_meta['msg_size']
 
             # Determine if we should output a throughput figure
             window_length_sec = current_time - window_start_time
 
-            if window_length_sec >= self.throughput_debug_interval_in_sec:
-                throughput_mb_per_s = float(kbs_so_far / (self.throughput_debug_interval_in_sec * self.kbs_in_mb))
+            if window_length_sec >= self.THROUGHPUT_DEBUG_INTERVAL_SEC:
+                throughput_mb_per_s = float(kbs_so_far / (self.THROUGHPUT_DEBUG_INTERVAL_SEC * self.KBS_IN_MB))
                 print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
                 print('Peak memory use: {} Mb'.format(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024))
                 h = hp.heap()
@@ -120,8 +120,8 @@ class FSConsumer(StoppableThread):
 
         self.consumer.close()
 
-    def get_total(self):
-        return self.total_kbs
+    def total_kbs(self):
+        return self._total_kbs
 
     # equivalent to: curl endpoint --header "Content-Type: application/json" --request POST --data data endpoint_url
     def post(endpoint_url, payload):
@@ -130,7 +130,14 @@ class FSConsumer(StoppableThread):
         requests.post(endpoint_url, data=json.dumps(payload), headers=headers)
 
     def report(self, current_time, throughput_mb_per_s, timestamps):
-        if self.endpoint_url.startswith("http://"):
+        endpoint_url = None
+        try:
+            endpoint_url = self.config["ENDPOINT_URL"]
+        except KeyError:
+            print("[Warning] - missing ENDPOINT_URL in config.")
+            endpoint_url = "print"
+
+        if endpoint_url.startswith("http://"):
             topics = timestamps.keys()
             min_ts = {
                 topic: min(timestamps[topic])
@@ -158,16 +165,22 @@ class FSConsumer(StoppableThread):
                 max_lateness=max(max_lateness),
                 id=self.consumer_id
             )
-            self.post(self.endpoint_url, payload)
+            self.post(endpoint_url, payload)
         else:
             print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
 
 
 if __name__ == '__main__':
-    # get the consumer_id from the environment
-    consumer_id = os.environ["POD_NAME"]
+    # get the consumer_id from the environment, if present
+    consumer_id = None
+    try:
+        consumer_id = os.environ["POD_NAME"]
+    except KeyError:
+        # not available in environment, generate an id
+        id_alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+        consumer_id = ''.join([random.choice(id_alphabet) for _ in range(6)])
 
-    kafka_servers = 'internal-service-0.kafka.svc.cluster.local:32400'
+    kafka_servers = "internal-service-0.kafka.svc.cluster.local:32400"
 
     # Whether to only listen for messages that occurred since the consumer started ('latest'),
     # or to pick up all messages that the consumer has missed ('earliest').
