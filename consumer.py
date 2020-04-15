@@ -116,7 +116,7 @@ def poll(consumer):
     if msg is None:
         return meta
 
-    if msg.error():
+    if msg.error:
         meta['error'] = msg.error()
         return meta
 
@@ -146,7 +146,7 @@ while True:
         continue
 
     # check if error from consumer
-    if message_meta['error']:
+    if 'error' in message_meta:
         print("Consumer error: {}".format(message_meta['error']))
         continue
 
