@@ -1,8 +1,19 @@
 # focus-sensors
 
-## Quickstart
-
 Assumes a *nix based machine.
+
+## LOCAL
+
+To run the tests do the following:
+
+```shell script
+$> pipenv update
+$> pipenv shell
+$> python -m unittest tests/test_*.py
+```
+
+## CLOUD (GCP)
+
 
 ## To setup Kafka on a local machine
 
