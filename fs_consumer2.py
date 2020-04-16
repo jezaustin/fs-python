@@ -124,7 +124,7 @@ class FSConsumer(StoppableThread):
         return self._total_kbs
 
     # equivalent to: curl endpoint --header "Content-Type: application/json" --request POST --data data endpoint_url
-    def post(endpoint_url, payload):
+    def post(self, endpoint_url, payload):
         # uses lib requests
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         requests.post(endpoint_url, data=json.dumps(payload), headers=headers)
