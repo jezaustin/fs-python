@@ -36,7 +36,7 @@ class FSConsumer2(StoppableThread):
 
         meta = {}
         if message is None:
-            print("[FSConsumer2] - Message is None.")
+            #print("[FSConsumer2] - Message is None.")
             return meta
 
         # returns None if no error, KafkaError otherwise
@@ -50,10 +50,10 @@ class FSConsumer2(StoppableThread):
         meta['msg_size'] = sys.getsizeof(message.value()) / 1000
         meta['timestamp'] = message.timestamp()[1]
 
-        print("refcount msg={}, msg.value={}".format(
-            sys.getrefcount(msg),
-            sys.getrefcount(msg.value)
-        ));
+        #print("refcount msg={}, msg.value={}".format(
+        #    sys.getrefcount(msg),
+        #    sys.getrefcount(msg.value)
+        #));
 
         return meta
 
@@ -81,7 +81,7 @@ class FSConsumer2(StoppableThread):
             # check if message was received
             if not message_meta:
                 nomsg_count = nomsg_count + 1
-                if 10 < current_time - last_subscribe_time:
+                if (current_time - last_subscribe_time) < 10:
                     print("number of nomsgs: {}".format(nomsg_count))
                     last_subscribe_time = current_time
                 continue
