@@ -89,7 +89,9 @@ c = Consumer({
     'group.id': consumer_id,  # 'mygroup',
     'auto.offset.reset': read_topic_from,
     # 'metadata.max.age.ms': 5000,
-    'max.partition.fetch.bytes': 7500 * 1024
+    'max.partition.fetch.bytes': 7500 * 1024,
+    # see https://github.com/confluentinc/confluent-kafka-python/issues/759
+    'queued.max.messages.kbytes': 1500
 })
 
 last_subscribe_time = int(time.time())
