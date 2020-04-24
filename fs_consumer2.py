@@ -50,6 +50,11 @@ class FSConsumer(StoppableThread):
         meta['msg_size'] = sys.getsizeof(message.value()) / 1000
         meta['timestamp'] = message.timestamp()[1]
 
+        print("refcount msg={}, msg.value={}".format(
+            sys.getrefcount(msg),
+            sys.getrefcount(msg.value)
+        ));
+
         return meta
 
     def run(self):

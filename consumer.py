@@ -130,6 +130,11 @@ def poll(consumer):
     # explicitly delete the msg
     # del msg
 
+    print("refcount msg={}, msg.value={}".format(
+        sys.getrefcount(msg),
+        sys.getrefcount(msg.value)
+    ));
+
     return meta
 
 
