@@ -198,6 +198,9 @@ if __name__ == '__main__':
         'auto.offset.reset': read_topic_from,
         # 'metadata.max.age.ms': 5000,
         'max.partition.fetch.bytes': 7500 * 1024
+        # see https://github.com/confluentinc/confluent-kafka-python/issues/759
+        # queue a maximum of 100 messages
+        'queued.max.messages.kbytes': 75000
     })
 
     topic_name = ["sensor{}".format(i) for i in range(50)]
