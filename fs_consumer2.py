@@ -14,7 +14,7 @@ from config.base_config import BaseConfig
 from stoppable_thread import StoppableThread
 
 
-class FSConsumer(StoppableThread):
+class FSConsumer2(StoppableThread):
     THROUGHPUT_DEBUG_INTERVAL_SEC = 5
     KBS_IN_MB = 1000
     POLL_INTERVAL = 1.0
@@ -28,7 +28,7 @@ class FSConsumer(StoppableThread):
         self.consumer_id = consumer_id
         self.topic_name = topic_name
 
-        print("[FSConsumer] - consumer_id={}, topic_name={}, config={}".format(self.consumer_id, self.topic_name, self.config))
+        print("[FSConsumer2] - consumer_id={}, topic_name={}, config={}".format(self.consumer_id, self.topic_name, self.config))
 
 
     def poll(self):
@@ -36,12 +36,12 @@ class FSConsumer(StoppableThread):
 
         meta = {}
         if message is None:
-            print("[FSConsumer] - Message is None.")
+            print("[FSConsumer2] - Message is None.")
             return meta
 
         # returns None if no error, KafkaError otherwise
         if message.error() is KafkaError:
-            print("[FSConsumer] - KafkaError from client.")
+            print("[FSConsumer2] - KafkaError from client.")
             meta['error'] = message.error()
             return meta
 
@@ -58,7 +58,7 @@ class FSConsumer(StoppableThread):
         return meta
 
     def run(self):
-        print("Starting FSConsumer with poll interval {}".format(self.POLL_INTERVAL))
+        print("Starting FSConsumer2 with poll interval {}".format(self.POLL_INTERVAL))
 
         print("Subscribing to topic(s) {}".format(self.topic_name))
         self.consumer.subscribe(self.topic_name)
@@ -197,12 +197,12 @@ if __name__ == '__main__':
         'group.id': consumer_id,
         'auto.offset.reset': read_topic_from,
         # 'metadata.max.age.ms': 5000,
-        'max.partition.fetch.bytes': 7500 * 1024
+        'max.partition.fetch.bytes': 7500 * 1024,
         # see https://github.com/confluentinc/confluent-kafka-python/issues/759
         # queue a maximum of 100 messages
         'queued.max.messages.kbytes': 75000
     })
 
     topic_name = ["sensor{}".format(i) for i in range(50)]
-    consumer = FSConsumer(consumer, consumer_id, topic_name)
+    consumer = FSConsumer2(consumer, consumer_id, topic_name)
     consumer.run()
