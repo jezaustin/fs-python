@@ -112,10 +112,10 @@ class FSConsumer2(StoppableThread):
                 throughput_mb_per_s = float(kbs_so_far / (self.THROUGHPUT_DEBUG_INTERVAL_SEC * self.KBS_IN_MB))
                 print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
                 print('Peak memory use: {} Mb'.format(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024))
-                h = hp.heap()
-                by_types = h.bytype
+                # h = hp.heap()
+                # by_types = h.bytype
                 # by_refs = h.byrcs
-                print("Heap by types {}".format(by_types))
+                # print("Heap by types {}".format(by_types))
                 self.report(current_time, throughput_mb_per_s, timestamps)
 
                 # Reset ready for the next throughput indication
