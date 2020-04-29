@@ -5,7 +5,7 @@ import time
 import numpy
 
 from config.test_config import TestConfig
-from fs_consumer2 import FSConsumer
+from fs_consumer2 import FSConsumer2
 
 
 class MockMessage:
@@ -61,7 +61,7 @@ class TestFSConsumer2(unittest.TestCase):
         topic_name = "test_topic"
         consumer_id = "a556667"
         mock_kafka_consumer = MockKafkaConsumer(topic_name)
-        self.fs_consumer = FSConsumer(mock_kafka_consumer, consumer_id, topic_name, TestConfig.config())
+        self.fs_consumer = FSConsumer2(mock_kafka_consumer, consumer_id, topic_name, TestConfig.config())
         self.thread = threading.Thread(target=self.fs_consumer.run)
         self.thread.start()
 
@@ -70,7 +70,8 @@ class TestFSConsumer2(unittest.TestCase):
         self.fs_consumer.stop()
 
     def test_fs_consumer2(self):
-        time.sleep(20)
+        print("Running for 5 seconds...")
+        time.sleep(5)
         # interrogate the consumer
         total = self.fs_consumer.total_kbs()
         print("total {}".format(total))
