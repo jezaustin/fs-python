@@ -69,10 +69,9 @@ class FSConsumer2(StoppableThread):
 
         hp = hpy()
         hp.setrelheap()
-        self.set_peak_memory()
+        self.get_peak_memory()
 
         while not self.isStopped():
-
             # Waits 1 second to receive a message, if it doesn't find one goes round the loop again
             message_meta = self.poll()
             current_time = int(time.time())
