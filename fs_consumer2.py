@@ -52,7 +52,7 @@ class FSConsumer2(StoppableThread):
 
         return meta
 
-    def set_peak_memory(self):
+    def get_peak_memory(self):
         return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
 
     def run(self):
