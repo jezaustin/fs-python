@@ -27,7 +27,7 @@ class FSConsumer2(StoppableThread):
         self.consumer = consumer
         self.consumer_id = consumer_id
         self.topic_name = topic_name
-
+        self.peak_memory_mb = self.get_peak_memory()
         print("[FSConsumer2] - consumer_id={}, topic_name={}, config={}".format(self.consumer_id, self.topic_name, self.config))
 
 
@@ -50,12 +50,10 @@ class FSConsumer2(StoppableThread):
         meta['msg_size'] = sys.getsizeof(message.value()) / 1000
         meta['timestamp'] = message.timestamp()[1]
 
-        #print("refcount msg={}, msg.value={}".format(
-        #    sys.getrefcount(msg),
-        #    sys.getrefcount(msg.value)
-        #));
-
         return meta
+
+    def set_peak_memory(self):
+        return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
 
     def run(self):
         print("Starting FSConsumer2 with poll interval {}".format(self.POLL_INTERVAL))
@@ -71,6 +69,7 @@ class FSConsumer2(StoppableThread):
 
         hp = hpy()
         hp.setrelheap()
+        self.set_peak_memory()
 
         while not self.isStopped():
 
@@ -111,7 +110,8 @@ class FSConsumer2(StoppableThread):
             if window_length_sec >= self.THROUGHPUT_DEBUG_INTERVAL_SEC:
                 throughput_mb_per_s = float(kbs_so_far / (self.THROUGHPUT_DEBUG_INTERVAL_SEC * self.KBS_IN_MB))
                 print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
-                print('Peak memory use: {} Mb'.format(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024))
+                self.peak_memory_mb = self.get_peak_memory()
+                print('Peak memory use: {} Mb'.format(self.peak_memory_mb))
                 # h = hp.heap()
                 # by_types = h.bytype
                 # by_refs = h.byrcs
@@ -168,7 +168,8 @@ class FSConsumer2(StoppableThread):
                 throughput=throughput_mb_per_s,
                 # min_timestamp = min(timestamps),
                 max_lateness=max(max_lateness),
-                consumer_id=self.consumer_id
+                consumer_id=self.consumer_id,
+                peak_memory_mb=self.peak_memory_mb
             )
             self.post(endpoint_url, payload)
         else:
