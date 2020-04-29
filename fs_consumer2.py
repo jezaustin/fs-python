@@ -168,7 +168,7 @@ class FSConsumer2(StoppableThread):
                 throughput=throughput_mb_per_s,
                 # min_timestamp = min(timestamps),
                 max_lateness=max(max_lateness),
-                id=self.consumer_id
+                consumer_id=self.consumer_id
             )
             self.post(endpoint_url, payload)
         else:
