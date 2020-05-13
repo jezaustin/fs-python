@@ -1,6 +1,6 @@
 
 class TestConfig:
-    ENDPOINT_URL = "print"
+    ENDPOINT_URL = "http://localhost:9000/test"
 
     @staticmethod
     def config():
