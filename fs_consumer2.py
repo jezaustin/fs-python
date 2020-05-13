@@ -5,7 +5,8 @@ import resource
 import sys
 import time
 
-import requests
+import asyncio
+import httpx
 from confluent_kafka import Consumer
 from confluent_kafka.cimpl import KafkaError
 from guppy import hpy
@@ -94,11 +95,6 @@ class FSConsumer2(StoppableThread):
             else:
                 timestamps[message_meta['topic']] = [message_meta['timestamp']]
 
-            if 10 < current_time - last_subscribe_time:
-                print("number of nomsgs: {}".format(nomsg_count))
-                nomsg_count = 0
-                last_subscribe_time = current_time
-
             # Maintain figures for throughput reporting
             kbs_so_far += message_meta['msg_size']
             self._total_kbs += message_meta['msg_size']
@@ -107,7 +103,9 @@ class FSConsumer2(StoppableThread):
             window_length_sec = current_time - window_start_time
 
             if window_length_sec >= self.THROUGHPUT_DEBUG_INTERVAL_SEC:
-                throughput_mb_per_s = float(kbs_so_far / (self.THROUGHPUT_DEBUG_INTERVAL_SEC * self.KBS_IN_MB))
+                window_end_time = int(time.time())
+                total_time = window_end_time - window_start_time
+                throughput_mb_per_s = float(kbs_so_far / (total_time * self.KBS_IN_MB))
                 print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
                 self.peak_memory_mb = self.get_peak_memory()
                 print('Peak memory use: {} Mb'.format(self.peak_memory_mb))
@@ -127,11 +125,11 @@ class FSConsumer2(StoppableThread):
     def total_kbs(self):
         return self._total_kbs
 
-    # equivalent to: curl endpoint --header "Content-Type: application/json" --request POST --data data endpoint_url
-    def post(self, endpoint_url, payload):
-        # uses lib requests
+    async def post(self, endpoint_url, payload):
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        requests.post(endpoint_url, data=json.dumps(payload), headers=headers)
+        async with httpx.AsyncClient() as client:
+            response = await client.post(endpoint_url, data=json.dumps(payload), headers=headers)
+        return response
 
     def report(self, current_time, throughput_mb_per_s, timestamps):
         endpoint_url = None
@@ -170,7 +168,9 @@ class FSConsumer2(StoppableThread):
                 consumer_id=self.consumer_id,
                 peak_memory_mb=self.peak_memory_mb
             )
-            self.post(endpoint_url, payload)
+
+            # call async to avoid blocking
+            asyncio.run(self.post(endpoint_url, payload))
         else:
             print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
 
@@ -192,6 +192,7 @@ if __name__ == '__main__':
     # Using 'latest' means the consumer must be started before the producer.
     read_topic_from = 'latest'
 
+    # https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
     consumer = Consumer({
         'bootstrap.servers': kafka_servers,
         'group.id': consumer_id,

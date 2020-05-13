@@ -8,10 +8,10 @@ verify_ssl = true
 [packages]
 avro-python3 = "==1.9.1"
 confluent-kafka = "==1.2.0"
-requests = "==2.9.1"
+httpx = "==0.12.1"
 numpy = "==1.18.2"
 memory-profiler = "==0.57.0"
 guppy3 = "==3.0.9"
 
 [requires]
-python_version = "3.6"
+python_version = "3.7.5"

@@ -1,3 +1,4 @@
+import asyncio
 import threading
 import unittest
 import time
@@ -62,14 +63,19 @@ class TestFSConsumer2(unittest.TestCase):
         consumer_id = "a556667"
         mock_kafka_consumer = MockKafkaConsumer(topic_name)
         self.fs_consumer = FSConsumer2(mock_kafka_consumer, consumer_id, topic_name, TestConfig.config())
-        self.thread = threading.Thread(target=self.fs_consumer.run)
-        self.thread.start()
 
     def tearDown(self):
         # stop the consumer
         self.fs_consumer.stop()
 
+    def test_post(self):
+        response = asyncio.run(self.fs_consumer.post("http://localhost:9000/test", "{'test': 'test'}"))
+        self.assertEqual(200, response.status_code)
+
     def test_fs_consumer2(self):
+        self.thread = threading.Thread(target=self.fs_consumer.run)
+        self.thread.start()
+
         print("Running for 5 seconds...")
         time.sleep(5)
         # interrogate the consumer
