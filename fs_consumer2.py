@@ -200,8 +200,9 @@ if __name__ == '__main__':
         'bootstrap.servers': kafka_servers,
         'group.id': consumer_id,
         'auto.offset.reset': read_topic_from,
-        # see https://docs.confluent.io/current/installation/configuration/consumer-configs.html
-        'metadata.max.age.ms': 5000,
+        # see https://docs.confluent.io/5.0.0/clients/confluent-kafka-python/index.html#configuration
+        # & see https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
+        'topic.metadata.refresh.interval.ms': 5000,
         'max.partition.fetch.bytes': 7500 * 1024,
         # see https://github.com/confluentinc/confluent-kafka-python/issues/759
         # queue a maximum of 100 messages
