@@ -29,15 +29,15 @@ class FSConsumer2(StoppableThread):
         self.consumer_id = consumer_id
         self.topic_name = topic_name
         self.peak_memory_mb = self.get_peak_memory()
-        print("[FSConsumer2] - consumer_id={}, topic_name={}, config={}".format(self.consumer_id, self.topic_name, self.config))
-
+        print("[FSConsumer2] - consumer_id={}, topic_name={}, config={}".format(self.consumer_id, self.topic_name,
+                                                                                self.config))
 
     def poll(self):
         message = self.consumer.poll(self.POLL_INTERVAL)
 
         meta = {}
         if message is None:
-            #print("[FSConsumer2] - Message is None.")
+            # print("[FSConsumer2] - Message is None.")
             return meta
 
         # returns None if no error, KafkaError otherwise
@@ -207,6 +207,9 @@ if __name__ == '__main__':
         'queued.max.messages.kbytes': 75000
     })
 
-    topic_name = ["sensor{}".format(i) for i in range(50)]
+    # topic_name = ["sensor{}".format(i) for i in range(9)]
+    # subscribe to all topics
+    # see https://docs.confluent.io/current/clients/confluent-kafka-python/#pythonclient-consumer
+    topic_name = "^.*"
     consumer = FSConsumer2(consumer, consumer_id, topic_name)
     consumer.run()
