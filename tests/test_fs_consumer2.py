@@ -59,31 +59,76 @@ class MockKafkaConsumer:
 
 class TestFSConsumer2(unittest.TestCase):
 
-    def test_post(self):
-        response = None
-        try:
-            response = asyncio.run(self.fs_consumer.post("http://localhost:9000/test", "{'test': 'test'}"))
-        except httpx.ReadTimeout as e:
-            print(e)
-        
+    def test_post_no_timeout(self):
+
+        topic_name = "test_topic"
+        consumer_id = "a556667"
+        mock_kafka_consumer = MockKafkaConsumer(topic_name)
+        fs_consumer = FSConsumer2(mock_kafka_consumer, consumer_id, topic_name, TestConfig.config())
+
+        response = asyncio.run(fs_consumer.post("http://localhost:9000/test", "{'test': 'test'}"))
+
         self.assertEqual(200, response.status_code)
 
+    def test_post_with_error(self):
+
+        topic_name = "test_topic"
+        consumer_id = "a556667"
+        mock_kafka_consumer = MockKafkaConsumer(topic_name)
+        fs_consumer = FSConsumer2(mock_kafka_consumer, consumer_id, topic_name, TestConfig.config())
+
+        try:
+            response = asyncio.run(fs_consumer.post("http://localhost:9000/test", "{'test': 'test'}"))
+            self.assertTrue(False)
+        except httpx.NetworkError as e:
+            pass
+
+    def test_post_with_timeout(self):
+
+        topic_name = "test_topic"
+        consumer_id = "a556667"
+        mock_kafka_consumer = MockKafkaConsumer(topic_name)
+        fs_consumer = FSConsumer2(mock_kafka_consumer, consumer_id, topic_name, TestConfig.config())
+
+        # default timeout is 5 seconds
+        try:
+            response = asyncio.run(fs_consumer.post("http://localhost:9000/test-with-timeout", "{'test': 'test'}"))
+            print(response.status_code)
+            self.assertTrue(False)
+        except httpx.ReadTimeout as e:
+            pass
+
+
+    def test_post_no_timeout(self):
+
+        topic_name = "test_topic"
+        consumer_id = "a556667"
+        mock_kafka_consumer = MockKafkaConsumer(topic_name)
+        fs_consumer = FSConsumer2(mock_kafka_consumer, consumer_id, topic_name, TestConfig.config())
+
+        response = None
+        try:
+            response = asyncio.run(fs_consumer.post("http://localhost:9000/test", "{'test': 'test'}"))
+        except httpx.ReadTimeout as e:
+            print(e)
+
+        self.assertEqual(200, response.status_code)
     def test_fs_consumer2(self):
         topic_name = "test_topic"
         consumer_id = "a556667"
         mock_kafka_consumer = MockKafkaConsumer(topic_name)
-        self.fs_consumer = FSConsumer2(mock_kafka_consumer, consumer_id, topic_name, TestConfig.config())
+        fs_consumer = FSConsumer2(mock_kafka_consumer, consumer_id, topic_name, TestConfig.config())
 
-        self.thread = threading.Thread(target=self.fs_consumer.run)
+        self.thread = threading.Thread(target=fs_consumer.run)
         self.thread.start()
 
         print("Running for 10 seconds...")
         time.sleep(10)
 
         # interrogate the consumer
-        total = self.fs_consumer.total_kbs()
+        total = fs_consumer.total_kbs()
         print("total {}".format(total))
         self.assertTrue(total > 0)
 
         # stop the consumer
-        self.fs_consumer.stop()
+        fs_consumer.stop()
