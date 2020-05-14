@@ -29,7 +29,7 @@ class FSConsumer2(StoppableThread):
         self.consumer_id = consumer_id
         self.topic_list = topic_list
         self.peak_memory_mb = self.get_peak_memory()
-        print("[FSConsumer2] - consumer_id={}, topic_name={}, config={}".format(self.consumer_id, self.topic_list,
+        print("[FSConsumer2] - consumer_id={}, topic_list={}, config={}".format(self.consumer_id, self.topic_list,
                                                                                 self.config))
 
     def poll(self):
