@@ -170,7 +170,10 @@ class FSConsumer2(StoppableThread):
             )
 
             # call async to avoid blocking
-            asyncio.run(self.post(endpoint_url, payload))
+            try:
+                asyncio.run(self.post(endpoint_url, payload))
+            except httpx.ReadTimeout as e:
+                print(f"Timeout POSTing to endpoint {endpoint_url}, {e}")
         else:
             print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
 

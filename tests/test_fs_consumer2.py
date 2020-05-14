@@ -3,6 +3,7 @@ import threading
 import unittest
 import time
 
+import httpx
 import numpy
 
 from config.test_config import TestConfig
@@ -59,7 +60,12 @@ class MockKafkaConsumer:
 class TestFSConsumer2(unittest.TestCase):
 
     def test_post(self):
-        response = asyncio.run(self.fs_consumer.post("http://localhost:9000/test", "{'test': 'test'}"))
+        response = None
+        try:
+            response = asyncio.run(self.fs_consumer.post("http://localhost:9000/test", "{'test': 'test'}"))
+        except httpx.ReadTimeout as e:
+            print(e)
+        
         self.assertEqual(200, response.status_code)
 
     def test_fs_consumer2(self):
