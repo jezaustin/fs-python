@@ -21,15 +21,15 @@ class FSConsumer2(StoppableThread):
     POLL_INTERVAL = 1.0
     _total_kbs = 0.0
 
-    def __init__(self, consumer, consumer_id, topic_name="test", config=BaseConfig.config(), *args, **kwargs):
+    def __init__(self, consumer, consumer_id, topic_list=[], config=BaseConfig.config(), *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.config = config
         self.consumer = consumer
         self.consumer_id = consumer_id
-        self.topic_name = topic_name
+        self.topic_list = topic_list
         self.peak_memory_mb = self.get_peak_memory()
-        print("[FSConsumer2] - consumer_id={}, topic_name={}, config={}".format(self.consumer_id, self.topic_name,
+        print("[FSConsumer2] - consumer_id={}, topic_name={}, config={}".format(self.consumer_id, self.topic_list,
                                                                                 self.config))
 
     def poll(self):
@@ -59,8 +59,8 @@ class FSConsumer2(StoppableThread):
     def run(self):
         print("Starting FSConsumer2 with poll interval {}".format(self.POLL_INTERVAL))
 
-        print("Subscribing to topic(s) {}".format(self.topic_name))
-        self.consumer.subscribe(self.topic_name)
+        print("Subscribing to topic(s) {}".format(self.topic_list))
+        self.consumer.subscribe(self.topic_list)
         last_subscribe_time = int(time.time())
 
         nomsg_count = 0
@@ -200,7 +200,8 @@ if __name__ == '__main__':
         'bootstrap.servers': kafka_servers,
         'group.id': consumer_id,
         'auto.offset.reset': read_topic_from,
-        # 'metadata.max.age.ms': 5000,
+        # see https://docs.confluent.io/current/installation/configuration/consumer-configs.html
+        'metadata.max.age.ms': 5000,
         'max.partition.fetch.bytes': 7500 * 1024,
         # see https://github.com/confluentinc/confluent-kafka-python/issues/759
         # queue a maximum of 100 messages
@@ -210,6 +211,6 @@ if __name__ == '__main__':
     # topic_name = ["sensor{}".format(i) for i in range(9)]
     # subscribe to all topics
     # see https://docs.confluent.io/current/clients/confluent-kafka-python/#pythonclient-consumer
-    topic_name = "^.*"
-    consumer = FSConsumer2(consumer, consumer_id, topic_name)
+    topic_list = ["^.*"]
+    consumer = FSConsumer2(consumer, consumer_id, topic_list)
     consumer.run()
