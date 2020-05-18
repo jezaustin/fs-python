@@ -2,12 +2,13 @@ import asyncio
 import threading
 import unittest
 import time
+from multiprocessing.pool import Pool
 
 import httpx
 import numpy
 
 from config.test_config import TestConfig
-from fs_consumer2 import FSConsumer2
+from fs_consumer2 import FSConsumer2, http_post
 
 
 class MockMessage:
@@ -19,7 +20,7 @@ class MockMessage:
 
         # payload (integers)
         payload_in_num_of_ints = int((750 * 1000) / 3)
-        #print("[MockMessage] - generating new payload of {} ints".format(payload_in_num_of_ints))
+        # print("[MockMessage] - generating new payload of {} ints".format(payload_in_num_of_ints))
         random_ints_ndarray = numpy.random.randint(2 ** 14, (2 ** 20) - 1, size=payload_in_num_of_ints)
         self._random_ints = random_ints_ndarray.tolist()
 
@@ -46,7 +47,7 @@ class MockKafkaConsumer:
         self._topic_name = topic_name
 
     def poll(self, interval):
-        #print("[MockKafkaConsumer] - poll called with topic_name {}".format(self._topic_name))
+        # print("[MockKafkaConsumer] - poll called with topic_name {}".format(self._topic_name))
         message = MockMessage(self._topic_name)
         return message
 
@@ -84,19 +85,13 @@ class TestFSConsumer2(unittest.TestCase):
             pass
 
     def test_post_with_timeout(self):
+        pool = Pool(processes=10)
+        pool.apply_async(http_post, ("http://localhost:9000/test-with-timeout", "{'test': 'test'}"))
 
-        topic_name = "test_topic"
-        consumer_id = "a556667"
-        mock_kafka_consumer = MockKafkaConsumer(topic_name)
-        fs_consumer = FSConsumer2(mock_kafka_consumer, consumer_id, topic_name, TestConfig.config())
+        # thread = threading.Thread(target=fs_consumer.post, args=["http://localhost:9000/test-with-timeout", "{'test': 'test'}"])
+        # thread.start()
 
-        # default timeout is 5 seconds
-        try:
-            response = asyncio.run(fs_consumer.post("http://localhost:9000/test-with-timeout", "{'test': 'test'}"))
-            print(response.status_code)
-            self.assertTrue(False)
-        except httpx.ReadTimeout as e:
-            pass
+        time.sleep(10)
 
 
     def test_post_no_timeout(self):
@@ -108,11 +103,12 @@ class TestFSConsumer2(unittest.TestCase):
 
         response = None
         try:
-            response = asyncio.run(fs_consumer.post("http://localhost:9000/test", "{'test': 'test'}"))
+            response = asyncio.create_task(fs_consumer.post("http://localhost:9000/test", "{'test': 'test'}"))
         except httpx.ReadTimeout as e:
             print(e)
 
         self.assertEqual(200, response.status_code)
+
     def test_fs_consumer2(self):
         topic_name = "test_topic"
         consumer_id = "a556667"

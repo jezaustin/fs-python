@@ -3,10 +3,11 @@ import os
 import random
 import resource
 import sys
+import threading
 import time
 
-import asyncio
 import httpx
+import urllib3
 from confluent_kafka import Consumer
 from confluent_kafka.cimpl import KafkaError
 from guppy import hpy
@@ -14,8 +15,24 @@ from guppy import hpy
 from config.base_config import BaseConfig
 from stoppable_thread import StoppableThread
 
+from multiprocessing import Pool
+
+
+# synchronous post (use Threads)
+def http_post(endpoint_url, payload):
+    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+    try:
+        httpx.post(endpoint_url, data=json.dumps(payload), headers=headers)
+    except httpx.ReadTimeout as e:
+        print(f"httpx read timeout exception {e}")
+    except urllib3.exceptions.ReadTimeoutError as e2:
+        print(f"urllib3 read timeout exception {e2}")
+
 
 class FSConsumer2(StoppableThread):
+    # pool of processes for the cnsumer endpoint posting
+    pool = Pool(processes=10)
+
     THROUGHPUT_DEBUG_INTERVAL_SEC = 5
     KBS_IN_MB = 1000
     POLL_INTERVAL = 1.0
@@ -125,12 +142,6 @@ class FSConsumer2(StoppableThread):
     def total_kbs(self):
         return self._total_kbs
 
-    async def post(self, endpoint_url, payload):
-        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        async with httpx.AsyncClient() as client:
-            response = await client.post(endpoint_url, data=json.dumps(payload), headers=headers)
-        return response
-
     def report(self, current_time, throughput_mb_per_s, timestamps):
         endpoint_url = None
         try:
@@ -169,11 +180,14 @@ class FSConsumer2(StoppableThread):
                 peak_memory_mb=self.peak_memory_mb
             )
 
-            # call async to avoid blocking
-            try:
-                asyncio.run(self.post(endpoint_url, payload))
-            except httpx.ReadTimeout as e:
-                print(f"Timeout POSTing to endpoint {endpoint_url}, {e}")
+            # use a separate thread to do the actual post
+            self.pool.apply_async(http_post, (endpoint_url, payload))
+
+            # thread = threading.Thread(target=self.post, args=[endpoint_url, payload])
+            # thread.start()
+
+            # non-threaded version
+            # self.post(endpoint_url, payload)
         else:
             print('Throughput in window: {} MB/s'.format(throughput_mb_per_s))
 
