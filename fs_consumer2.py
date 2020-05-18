@@ -11,6 +11,7 @@ import urllib3
 from confluent_kafka import Consumer
 from confluent_kafka.cimpl import KafkaError
 from guppy import hpy
+from httpx import Timeout
 
 from config.base_config import BaseConfig
 from stoppable_thread import StoppableThread
@@ -18,11 +19,12 @@ from stoppable_thread import StoppableThread
 from multiprocessing import Pool
 
 
-# synchronous post (use Threads)
+# synchronous post (using Threads)
 def http_post(endpoint_url, payload):
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
     try:
-        httpx.post(endpoint_url, data=json.dumps(payload), headers=headers)
+        # Override default timeout to 10s
+        httpx.post(endpoint_url, data=json.dumps(payload), headers=headers, timeout=Timeout(timeout=10.0))
     except httpx.ReadTimeout as e:
         print(f"httpx read timeout exception {e}")
     except urllib3.exceptions.ReadTimeoutError as e2:
