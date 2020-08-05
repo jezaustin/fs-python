@@ -132,7 +132,7 @@ def delivery_report(err, msg):
         window_length_sec = current_time - window_start_time
 
         if window_length_sec >= throughput_debug_interval_in_sec:
-            print('{} - Throughput in window: {} MB/s'.format( datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            print('{} - Throughput in window: {} MB/s'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     int((messages_sent_current_window * payload_size_in_kb) / (throughput_debug_interval_in_sec*kbs_in_mb))))
             
             # Reset ready for the next throughput indication
