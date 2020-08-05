@@ -1,13 +1,11 @@
-#!/home/nicholas/workspace/fs-kafka python3
-
 ##!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import io, random
+import io
 import os
+from datetime import datetime
 
 from confluent_kafka import Producer
-import avro.schema
 import avro.io
 import time
 import requests
@@ -17,9 +15,6 @@ import numpy
 ###
 ### PLEASE SET THE BELOW CONFIGURATION
 ###
-
-# ID of this sensor, used to determine what partition to write to
-#sensor_id = os.environ["POD_UID"][0:4]
 
 # Approximate size of message payload required to be sent in KB
 MESSAGE_SIZE_KB=750
@@ -46,9 +41,7 @@ throughput_debug_interval_in_sec = 10
 max_payloads_before_flush = 5
 
 # Address of the kafka servers and topic name
-#kafka_servers = '192.168.56.101:9092'
 kafka_servers = 'internal-service-0.kafka.svc.cluster.local:32400'
-#topic_name = 'test'
 endpoint_url="http://focussensors.duckdns.org:9000/producer_id"
 headers={'Accept': 'text/plain'}
 response = requests.get(endpoint_url, headers)
@@ -99,6 +92,7 @@ rate_current_second = None         # Set later, curret second.  Used to check da
 rate_for_second_so_far = 0         # Ensure we don't exceed the data rate in any given second
 rate_exceeded = False              # If this flag is set prevents any further writes so we don't exceed upper limit
 
+
 def delivery_report(err, msg):
     """ Called once for each message produced to indicate delivery result.
         Triggered by poll() or flush(). """
@@ -116,14 +110,14 @@ def delivery_report(err, msg):
         total_payloads_sent += 1
         
         current_time = int(time.time())
-        #print('Recieved message @ {}'.format(current_time))
+        #print('Received message @ {}'.format(current_time))
 
         if current_time != rate_current_second:
             # We are in a new second, we can reset rate throttling
             rate_exceeded = False
             rate_for_second_so_far = 0 
             rate_current_second = current_time
-            print('producer_heartbeat {}'.format(sensor_id))
+            # print('producer_heartbeat {}'.format(sensor_id))
         
         # Add the payload we've sent to the total so far
         rate_for_second_so_far += payload_size_in_kb
@@ -138,7 +132,7 @@ def delivery_report(err, msg):
         window_length_sec = current_time - window_start_time
 
         if window_length_sec >= throughput_debug_interval_in_sec:
-            print('Throughput in window: {} MB/s'.format(
+            print('{} - Throughput in window: {} MB/s'.format( datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     int((messages_sent_current_window * payload_size_in_kb) / (throughput_debug_interval_in_sec*kbs_in_mb))))
             
             # Reset ready for the next throughput indication
