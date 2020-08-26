@@ -3,7 +3,6 @@ import os
 import random
 import resource
 import sys
-import threading
 import time
 
 import httpx
@@ -24,7 +23,8 @@ def http_post(endpoint_url, payload):
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
     try:
         # Override default timeout to 10s
-        httpx.post(endpoint_url, data=json.dumps(payload), headers=headers, timeout=Timeout(timeout=10.0))
+        with httpx.Client() as client:
+            client.post(endpoint_url, data=json.dumps(payload), headers=headers, timeout=Timeout(timeout=10.0))
     except httpx.ReadTimeout as e:
         print(f"httpx read timeout exception {e}")
     except urllib3.exceptions.ReadTimeoutError as e2:
@@ -35,7 +35,7 @@ class FSConsumer2(StoppableThread):
     # pool of processes for the cnsumer endpoint posting
     pool = Pool(processes=10)
 
-    THROUGHPUT_DEBUG_INTERVAL_SEC = 5
+    THROUGHPUT_DEBUG_INTERVAL_SEC = 10
     KBS_IN_MB = 1000
     POLL_INTERVAL = 1.0
     _total_kbs = 0.0
