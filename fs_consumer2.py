@@ -35,7 +35,7 @@ class FSConsumer2(StoppableThread):
     # pool of processes for the cnsumer endpoint posting
     pool = Pool(processes=10)
 
-    THROUGHPUT_DEBUG_INTERVAL_SEC = 10
+    THROUGHPUT_DEBUG_INTERVAL_SEC = 20
     KBS_IN_MB = 1000
     POLL_INTERVAL = 1.0
     _total_kbs = 0.0
